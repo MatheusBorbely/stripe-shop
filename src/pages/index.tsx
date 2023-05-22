@@ -1,17 +1,18 @@
 import { stripe } from "@/lib/stripe";
 import { MainContainer, CardProduct } from '@/styles/pages/home';
-import { GetServerSideProps } from "next";
+import { GetStaticProps } from "next";
 import Image from "next/image";
 import Stripe from "stripe";
 import { useKeenSlider } from 'keen-slider/react'
 import 'keen-slider/keen-slider.min.css'
+import Link from "next/link";
 
 interface TypeProduct {
   products: {
     id: string,
     name: string,
     imageUrl: string,
-    price: number
+    price: string
   }[]
 }
 
@@ -29,13 +30,15 @@ export default function Home({ products }: TypeProduct) {
       <MainContainer ref={sliderRef} className="keen-slider">
         {products.map((product) => {
           return (
-            <CardProduct key={product.id} className="keen-slider__slide">
-              <Image src={product.imageUrl} width={520} height={480} alt="" />
-              <footer>
-                <h2>{ product.name }</h2>
-                <span>{ product.price }</span>
-              </footer>
-            </CardProduct>
+            <Link key={product.id} href={`/product/${product.id}`} prefetch={false}>
+              <CardProduct className="keen-slider__slide">
+                <Image src={product.imageUrl} width={520} height={480} alt={product.name} />
+                <footer>
+                  <h2>{ product.name }</h2>
+                  <span>{ product.price }</span>
+                </footer>
+              </CardProduct>
+            </Link>
           );
         })}
       </MainContainer>
@@ -43,7 +46,7 @@ export default function Home({ products }: TypeProduct) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getStaticProps: GetStaticProps = async () => {
   const response = await stripe.products.list({
     expand: ['data.default_price']
   });
@@ -64,7 +67,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
   return {
     props: {
       products
-    }
+    },
+    revalidate: (60 * 60) * 1 // 1 HOUR
   }
 
 };
