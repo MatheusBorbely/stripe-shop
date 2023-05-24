@@ -1,11 +1,15 @@
-import { stripe } from "@/lib/stripe";
-import { MainContainer, CardProduct } from '@/styles/pages/home';
+import Head from "next/head";
+import Link from "next/link";
 import { GetStaticProps } from "next";
 import Image from "next/image";
-import Stripe from "stripe";
+
 import { useKeenSlider } from 'keen-slider/react'
 import 'keen-slider/keen-slider.min.css'
-import Link from "next/link";
+import Stripe from "stripe";
+import { stripe } from "@/lib/stripe";
+
+import { MainContainer, CardProduct } from '@/styles/pages/home';
+
 
 interface TypeProduct {
   products: {
@@ -27,6 +31,9 @@ export default function Home({ products }: TypeProduct) {
 
   return (
     <>
+      <Head>
+        <title>Stripe Shop</title>
+      </Head>
       <MainContainer ref={sliderRef} className="keen-slider">
         {products.map((product) => {
           return (
@@ -70,6 +77,5 @@ export const getStaticProps: GetStaticProps = async () => {
     },
     revalidate: (60 * 60) * 1 // 1 HOUR
   }
-
 };
 
